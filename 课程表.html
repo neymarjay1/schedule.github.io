@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#5b5be8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="课程表">
+<meta name="format-detection" content="telephone=no,email=no,address=no">
+<title>课程表 · 2026-2027 秋季学期</title>
+<style>
+:root{
+  --brand:#4a55e0;
+  --brand-2:#9b6dff;
+  --ink:#1b1f2e;
+  --ink-2:#6d7590;
+  --ink-3:#959bb0;
+  --ink-4:#b4b9cc;
+  --line:#f2f4f8;
+  --bg:#f2f4f8;
+  --card:#ffffff;
+  --radius:18px;
+  --shadow:0 8px 24px rgba(30,40,90,.06);
+  --maxw:480px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;padding:0;background:#e9ecf3;color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Helvetica Neue","Microsoft YaHei",sans-serif;
+  -webkit-font-smoothing:antialiased;
+  line-height:1.45;
+}
+.wrap{
+  position:relative;max-width:var(--maxw);margin:0 auto;min-height:100vh;
+  background:var(--bg);overflow-x:hidden;
+  padding-bottom:calc(28px + env(safe-area-inset-bottom));
+}
+@media(min-width:640px){
+  .wrap{box-shadow:0 0 60px rgba(20,30,70,.13)}
+}
+
+/* ============ 顶部 ============ */
+.hero{
+  position:relative;overflow:hidden;
+  background:linear-gradient(135deg,#4a55e0 0%,#6d5be8 46%,#9b6dff 100%);
+  border-radius:0 0 26px 26px;
+  padding:calc(env(safe-area-inset-top) + 16px) 16px 26px;
+}
+.blob{position:absolute;border-radius:50%;pointer-events:none}
+.b1{width:210px;height:210px;top:-100px;right:-70px;background:rgba(255,255,255,.13)}
+.b2{width:130px;height:130px;bottom:-70px;left:-45px;background:rgba(255,255,255,.09)}
+.b3{width:70px;height:70px;top:110px;left:22px;background:rgba(255,255,255,.05)}
+.hero-inner{position:relative;z-index:2}
+
+.hero-title{display:flex;align-items:center;gap:8px}
+.hero-title h1{margin:0;font-size:19px;font-weight:700;color:#fff;letter-spacing:.3px}
+.hero-meta{margin-top:7px;font-size:12px;color:rgba(255,255,255,.75)}
+
+.week-bar{
+  margin-top:18px;display:flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,.16);border-radius:16px;padding:7px 9px;
+}
+.arrow{
+  width:36px;height:36px;flex:0 0 36px;border-radius:50%;border:0;
+  background:rgba(255,255,255,.2);color:#fff;font-size:21px;line-height:1;
+  display:flex;align-items:center;justify-content:center;
+  font-family:inherit;cursor:pointer;transition:background .15s,transform .1s;
+}
+.arrow:active{background:rgba(255,255,255,.36);transform:scale(.93)}
+.arrow[disabled]{opacity:.3}
+.week-mid{
+  flex:1;min-width:0;text-align:center;background:none;border:0;color:#fff;
+  font-family:inherit;cursor:pointer;padding:2px 0;
+}
+.week-main{font-size:17px;font-weight:700;line-height:1.2}
+.week-range{font-size:11px;color:rgba(255,255,255,.78);margin-top:2px}
+
+.days{display:flex;gap:4px;margin-top:14px}
+.day{
+  flex:1;min-width:0;padding:7px 0 8px;border-radius:14px;border:0;background:none;
+  text-align:center;color:rgba(255,255,255,.82);font-family:inherit;cursor:pointer;
+  transition:background .16s,color .16s,transform .1s;
+}
+.day:active{transform:scale(.94)}
+.day .n{font-size:11px;line-height:1.35}
+.day .d{font-size:17px;font-weight:700;line-height:1.3;margin-top:1px}
+.day .dot{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.9);margin:4px auto 0;opacity:0}
+.day.has .dot{opacity:1}
+.day.hol .d{color:rgba(255,255,255,.45)}
+.day.today{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.7)}
+.day.on{background:#fff;color:#5b5be8;box-shadow:0 6px 18px rgba(28,24,80,.2)}
+.day.on .dot{background:#5b5be8}
+.day.on.hol .d{color:#b9bdd6}
+
+/* ============ 分段 ============ */
+.seg{
+  display:flex;gap:4px;margin:-18px 16px 0;background:#fff;border-radius:16px;
+  padding:4px;box-shadow:0 8px 24px rgba(30,40,90,.09);position:relative;z-index:5;
+}
+.seg button{
+  flex:1;padding:10px 0;border:0;border-radius:12px;background:none;
+  font-family:inherit;font-size:13px;color:#8a90a6;cursor:pointer;transition:all .16s;
+}
+.seg button.on{background:#eef0ff;color:var(--brand);font-weight:600}
+
+/* ============ 列表 ============ */
+.sec{display:flex;align-items:center;justify-content:space-between;padding:20px 16px 10px}
+.sec h2{margin:0;font-size:15px;font-weight:700}
+.sec p{margin:3px 0 0;font-size:11.5px;color:var(--ink-3)}
+.todaybtn{
+  flex:0 0 auto;border:0;font-family:inherit;font-size:11.5px;color:var(--brand);
+  background:#eef0ff;padding:6px 12px;border-radius:999px;cursor:pointer;
+}
+.todaybtn:active{opacity:.7}
+
+.card{
+  display:flex;margin:0 16px 10px;background:var(--card);border-radius:var(--radius);
+  overflow:hidden;box-shadow:var(--shadow);cursor:pointer;
+  transition:transform .12s ease,box-shadow .12s ease;
+}
+.card:active{transform:scale(.985);box-shadow:0 4px 14px rgba(30,40,90,.1)}
+.card .bar{width:5px;flex:0 0 5px}
+.card .body{flex:1;min-width:0;padding:13px 13px 12px 12px}
+.card.past{opacity:.52}
+.card.now{box-shadow:0 0 0 2px var(--brand),0 8px 22px rgba(74,85,224,.18)}
+
+.row1{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.cname{font-size:16px;font-weight:700;line-height:1.35;min-width:0;flex:1}
+.badge{
+  flex:0 0 auto;font-size:11px;padding:3px 9px;border-radius:999px;line-height:1.5;
+  white-space:nowrap;
+}
+.ctime{margin-top:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.range{font-size:17px;font-weight:600;letter-spacing:.3px}
+.per{font-size:11.5px;color:var(--ink-3)}
+.live{
+  font-size:10.5px;font-weight:600;color:#fff;background:var(--brand);
+  padding:2px 7px;border-radius:999px;
+}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.tag{
+  font-size:11.5px;color:var(--ink-2);background:#f4f6fb;
+  padding:4px 9px;border-radius:8px;white-space:nowrap;
+  max-width:100%;overflow:hidden;text-overflow:ellipsis;
+}
+.cmeta{margin-top:7px;font-size:11.5px;color:var(--ink-3)}
+.cmeta b{color:var(--ink-2);font-weight:600}
+
+.hol{
+  display:flex;align-items:center;gap:12px;margin:0 16px 10px;padding:14px 15px;
+  background:linear-gradient(135deg,#fff5e6,#ffe9d1);border-radius:var(--radius);
+}
+.hol .ico{font-size:23px;line-height:1}
+.hol .t{font-size:14px;font-weight:700;color:#b26a00}
+.hol .s{margin-top:3px;font-size:11.5px;color:#c08a3e}
+
+.empty{text-align:center;padding:56px 0 46px}
+.empty .ico{font-size:38px}
+.empty .t{margin-top:12px;font-size:14px;color:#8a90a6}
+.empty .s{margin-top:5px;font-size:11.5px;color:var(--ink-4)}
+
+.foot{
+  text-align:center;font-size:11px;color:var(--ink-4);
+  padding:18px 30px 10px;line-height:1.7;
+}
+
+/* ============ 吸顶条 ============ */
+.sticky{
+  position:fixed;top:0;left:50%;width:100%;max-width:var(--maxw);z-index:60;
+  transform:translate(-50%,-130%);transition:transform .24s cubic-bezier(.22,1,.36,1);
+  background:rgba(255,255,255,.93);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(20,30,70,.06);
+  padding:calc(env(safe-area-inset-top) + 9px) 16px 9px;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+.sticky.on{transform:translate(-50%,0)}
+.sticky .l{font-size:13.5px;font-weight:700;color:var(--ink);min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sticky .l span{font-weight:400;color:var(--ink-3);font-size:12px;margin-left:6px}
+.sticky .r{flex:0 0 auto;display:flex;gap:6px}
+.mini{
+  border:0;font-family:inherit;font-size:12px;color:var(--brand);background:#eef0ff;
+  padding:6px 11px;border-radius:999px;cursor:pointer;
+}
+.mini:active{opacity:.7}
+.mini.ghost{background:#f4f6fb;color:var(--ink-2)}
+
+/* ============ 弹层 ============ */
+.mask{
+  position:fixed;top:0;right:0;bottom:0;left:0;background:rgba(16,20,40,.45);z-index:90;
+  opacity:0;pointer-events:none;transition:opacity .22s ease;
+}
+.mask.on{opacity:1;pointer-events:auto}
+.sheet{
+  position:fixed;left:50%;bottom:0;width:100%;max-width:var(--maxw);z-index:91;
+  background:#fff;border-radius:24px 24px 0 0;
+  padding:12px 20px calc(22px + env(safe-area-inset-bottom));
+  max-height:82vh;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  transform:translate(-50%,110%);transition:transform .3s cubic-bezier(.22,1,.36,1);
+}
+.sheet.on{transform:translate(-50%,0)}
+.grab{width:36px;height:4px;border-radius:999px;background:#e4e7f0;margin:0 auto 14px}
+.shead{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.shead h3{margin:0;font-size:19px;font-weight:800;line-height:1.35;flex:1;min-width:0}
+.srows{margin-top:14px}
+.srow{display:flex;padding:10px 0;border-bottom:1px solid var(--line);font-size:13px}
+.srow:last-child{border-bottom:0}
+.srow .k{flex:0 0 62px;color:var(--ink-3)}
+.srow .v{flex:1;color:#2b3040;word-break:break-word}
+.slabel{margin-top:16px;font-size:12px;color:var(--ink-3)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.chip{font-size:11.5px;color:var(--brand);background:#eef0ff;padding:5px 10px;border-radius:8px}
+.chip.off{color:var(--ink-4);background:#f4f6fb;text-decoration:line-through}
+.sleg{margin-top:7px;font-size:11px;color:var(--ink-4)}
+.sbtn{
+  margin-top:18px;width:100%;height:46px;border:0;border-radius:999px;
+  background:linear-gradient(135deg,#4a55e0,#9b6dff);color:#fff;
+  font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;
+}
+.sbtn:active{opacity:.86}
+
+.wgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}
+.wcell{
+  border:1.5px solid var(--line);background:#fbfcfe;border-radius:12px;
+  padding:9px 6px;font-family:inherit;cursor:pointer;text-align:center;
+  transition:all .14s;position:relative;
+}
+.wcell:active{transform:scale(.96)}
+.wcell .wn{font-size:14px;font-weight:700;color:var(--ink)}
+.wcell .wr{font-size:10.5px;color:var(--ink-3);margin-top:2px}
+.wcell.on{background:#eef0ff;border-color:var(--brand)}
+.wcell.on .wn{color:var(--brand)}
+.wcell .hd{
+  position:absolute;top:5px;right:5px;width:5px;height:5px;border-radius:50%;background:#f2994a;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+    <div class="hero-inner">
+      <div class="hero-title"><h1>课程表</h1></div>
+      <div class="hero-meta" id="heroMeta"></div>
+
+      <div class="week-bar">
+        <button class="arrow" id="prevBtn" aria-label="上一周">‹</button>
+        <button class="week-mid" id="weekMid">
+          <div class="week-main" id="weekMain"></div>
+          <div class="week-range" id="weekRange"></div>
+        </button>
+        <button class="arrow" id="nextBtn" aria-label="下一周">›</button>
+      </div>
+
+      <div class="days" id="days"></div>
+    </div>
+  </header>
+
+  <nav class="seg">
+    <button id="tabWeek" class="on">本周课表</button>
+    <button id="tabAll">全部课程</button>
+  </nav>
+
+  <main id="main"></main>
+
+  <div class="foot" id="foot"></div>
+</div>
+
+<div class="sticky" id="sticky">
+  <div class="l" id="stickyL"></div>
+  <div class="r">
+    <button class="mini" id="stickyToday">回到今天</button>
+    <button class="mini ghost" id="stickyWeek">换周</button>
+  </div>
+</div>
+
+<div class="mask" id="mask"></div>
+<div class="sheet" id="sheet"></div>
+
+<script>
+var DATA = {"sem":{"title":"2026级全日制法律（非法学）","term":"2026-2027 秋季学期","total":17,"startYear":2026,"startMonth":9,"startDay":7,"weeks":18},"holidays":[{"name":"中秋节","from":"2026-09-25","to":"2026-09-27"},{"name":"国庆节","from":"2026-10-01","to":"2026-10-07"},{"name":"元旦","from":"2027-01-01","to":"2027-01-03"}],"weekRanges":["9月7日 - 13日","9月14日 - 20日","9月21日 - 27日","9月28日 - 10月4日","10月5日 - 11日","10月12日 - 18日","10月19日 - 25日","10月26日 - 11月1日","11月2日 - 8日","11月9日 - 15日","11月16日 - 22日","11月23日 - 29日","11月30日 - 12月6日","12月7日 - 13日","12月14日 - 20日","12月21日 - 27日","12月28日 - 1月3日","1月4日 - 10日"],"totalSessions":103,"groups":[{"gi":0,"name":"商法学","teacher":"张丽琴","weekday":1,"weekdayName":"周一","weeksText":"第6-13周","periods":"第3-4节","start":"10:00","end":"11:40","timeText":"10:00 - 11:40","room":"E教107","credit":"2学分32学时","note":"","weekend":false,"color":"#5B7CFA","bg":"rgba(91,124,250,0.12)","dates":[{"text":"2026-10-12","cn":"10月12日","week":6,"off":false,"tip":""},{"text":"2026-10-19","cn":"10月19日","week":7,"off":false,"tip":""},{"text":"2026-10-26","cn":"10月26日","week":8,"off":false,"tip":""},{"text":"2026-11-02","cn":"11月2日","week":9,"off":false,"tip":""},{"text":"2026-11-09","cn":"11月9日","week":10,"off":false,"tip":""},{"text":"2026-11-16","cn":"11月16日","week":11,"off":false,"tip":""},{"text":"2026-11-23","cn":"11月23日","week":12,"off":false,"tip":""},{"text":"2026-11-30","cn":"11月30日","week":13,"off":false,"tip":""}],"count":8,"skipped":0},{"gi":1,"name":"行政法与行政诉讼法学","teacher":"程关松","weekday":1,"weekdayName":"周一","weeksText":"第3-4周","periods":"第5-6节","start":"11:50","end":"14:45","timeText":"11:50 - 14:45","room":"E教510","credit":"2学分32学时","note":"第5节 11:50-12:35、第6节 14:00-14:45，中间为午休","weekend":false,"color":"#F2994A","bg":"rgba(242,153,74,0.12)","dates":[{"text":"2026-09-21","cn":"9月21日","week":3,"off":false,"tip":""},{"text":"2026-09-28","cn":"9月28日","week":4,"off":false,"tip":""}],"count":2,"skipped":0},{"gi":2,"name":"行政法与行政诉讼法学","teacher":"程关松","weekday":2,"weekdayName":"周二","weeksText":"第3-4周","periods":"第3-4节","start":"10:00","end":"11:40","timeText":"10:00 - 11:40","room":"E教510","credit":"2学分32学时","note":"","weekend":false,"color":"#F2994A","bg":"rgba(242,153,74,0.12)","dates":[{"text":"2026-09-22","cn":"9月22日","week":3,"off":false,"tip":""},{"text":"2026-09-29","cn":"9月29日","week":4,"off":false,"tip":""}],"count":2,"skipped":0},{"gi":3,"name":"金融法","teacher":"曾爱东","weekday":3,"weekdayName":"周三","weeksText":"第3-4周","periods":"第3-4节","start":"10:00","end":"11:40","timeText":"10:00 - 11:40","room":"E教119","credit":"2学分32学时","note":"","weekend":false,"color":"#12B886","bg":"rgba(18,184,134,0.12)","dates":[{"text":"2026-09-23","cn":"9月23日","week":3,"off":false,"tip":""},{"text":"2026-09-30","cn":"9月30日","week":4,"off":false,"tip":""}],"count":2,"skipped":0},{"gi":4,"name":"金融法","teacher":"曾爱东","weekday":3,"weekdayName":"周三","weeksText":"第6-11周","periods":"第3-4节","start":"10:00","end":"11:40","timeText":"10:00 - 11:40","room":"E教119","credit":"2学分32学时","note":"","weekend":false,"color":"#12B886","bg":"rgba(18,184,134,0.12)","dates":[{"text":"2026-10-14","cn":"10月14日","week":6,"off":false,"tip":""},{"text":"2026-10-21","cn":"10月21日","week":7,"off":false,"tip":""},{"text":"2026-10-28","cn":"10月28日","week":8,"off":false,"tip":""},{"text":"2026-11-04","cn":"11月4日","week":9,"off":false,"tip":""},{"text":"2026-11-11","cn":"11月11日","week":10,"off":false,"tip":""},{"text":"2026-11-18","cn":"11月18日","week":11,"off":false,"tip":""}],"count":6,"skipped":0},{"gi":5,"name":"刑法学","teacher":"夏春泓","weekday":3,"weekdayName":"周三","weeksText":"第2-14周","periods":"第7-9节","start":"14:55","end":"17:40","timeText":"14:55 - 17:40","room":"E教119","credit":"4学分64学时","note":"","weekend":false,"color":"#EB5757","bg":"rgba(235,87,87,0.12)","dates":[{"text":"2026-09-16","cn":"9月16日","week":2,"off":false,"tip":""},{"text":"2026-09-23","cn":"9月23日","week":3,"off":false,"tip":""},{"text":"2026-09-30","cn":"9月30日","week":4,"off":false,"tip":""},{"text":"2026-10-07","cn":"10月7日","week":5,"off":true,"tip":"国庆节"},{"text":"2026-10-14","cn":"10月14日","week":6,"off":false,"tip":""},{"text":"2026-10-21","cn":"10月21日","week":7,"off":false,"tip":""},{"text":"2026-10-28","cn":"10月28日","week":8,"off":false,"tip":""},{"text":"2026-11-04","cn":"11月4日","week":9,"off":false,"tip":""},{"text":"2026-11-11","cn":"11月11日","week":10,"off":false,"tip":""},{"text":"2026-11-18","cn":"11月18日","week":11,"off":false,"tip":""},{"text":"2026-11-25","cn":"11月25日","week":12,"off":false,"tip":""},{"text":"2026-12-02","cn":"12月2日","week":13,"off":false,"tip":""},{"text":"2026-12-09","cn":"12月9日","week":14,"off":false,"tip":""}],"count":12,"skipped":1},{"gi":6,"name":"英语PG1-4","teacher":"王晓莉","weekday":4,"weekdayName":"周四","weeksText":"第3-18周","periods":"第3-4节","start":"10:00","end":"11:40","timeText":"10:00 - 11:40","room":"E教124","credit":"","note":"","weekend":false,"color":"#9B51E0","bg":"rgba(155,81,224,0.12)","dates":[{"text":"2026-09-24","cn":"9月24日","week":3,"off":false,"tip":""},{"text":"2026-10-01","cn":"10月1日","week":4,"off":true,"tip":"国庆节"},{"text":"2026-10-08","cn":"10月8日","week":5,"off":false,"tip":""},{"text":"2026-10-15","cn":"10月15日","week":6,"off":false,"tip":""},{"text":"2026-10-22","cn":"10月22日","week":7,"off":false,"tip":""},{"text":"2026-10-29","cn":"10月29日","week":8,"off":false,"tip":""},{"text":"2026-11-05","cn":"11月5日","week":9,"off":false,"tip":""},{"text":"2026-11-12","cn":"11月12日","week":10,"off":false,"tip":""},{"text":"2026-11-19","cn":"11月19日","week":11,"off":false,"tip":""},{"text":"2026-11-26","cn":"11月26日","week":12,"off":false,"tip":""},{"text":"2026-12-03","cn":"12月3日","week":13,"off":false,"tip":""},{"text":"2026-12-10","cn":"12月10日","week":14,"off":false,"tip":""},{"text":"2026-12-17","cn":"12月17日","week":15,"off":false,"tip":""},{"text":"2026-12-24","cn":"12月24日","week":16,"off":false,"tip":""},{"text":"2026-12-31","cn":"12月31日","week":17,"off":false,"tip":""},{"text":"2027-01-07","cn":"1月7日","week":18,"off":false,"tip":""}],"count":15,"skipped":1},{"gi":7,"name":"环境资源法学","teacher":"赵小姣","weekday":4,"weekdayName":"周四","weeksText":"第5-12周","periods":"第6节","start":"14:00","end":"14:45","timeText":"14:00 - 14:45","room":"E教224","credit":"2学分32学时","note":"","weekend":false,"color":"#2D9CDB","bg":"rgba(45,156,219,0.12)","dates":[{"text":"2026-10-08","cn":"10月8日","week":5,"off":false,"tip":""},{"text":"2026-10-15","cn":"10月15日","week":6,"off":false,"tip":""},{"text":"2026-10-22","cn":"10月22日","week":7,"off":false,"tip":""},{"text":"2026-10-29","cn":"10月29日","week":8,"off":false,"tip":""},{"text":"2026-11-05","cn":"11月5日","week":9,"off":false,"tip":""},{"text":"2026-11-12","cn":"11月12日","week":10,"off":false,"tip":""},{"text":"2026-11-19","cn":"11月19日","week":11,"off":false,"tip":""},{"text":"2026-11-26","cn":"11月26日","week":12,"off":false,"tip":""}],"count":8,"skipped":0},{"gi":8,"name":"知识产权法学","teacher":"舒晓庆+肖启贤","weekday":4,"weekdayName":"周四","weeksText":"第5-15周","periods":"第0、A、B、C节","start":"17:50","end":"21:55","timeText":"17:50 - 21:55","room":"E教107","credit":"2学分32学时","note":"","weekend":false,"color":"#E8A33D","bg":"rgba(232,163,61,0.12)","dates":[{"text":"2026-10-08","cn":"10月8日","week":5,"off":false,"tip":""},{"text":"2026-10-15","cn":"10月15日","week":6,"off":false,"tip":""},{"text":"2026-10-22","cn":"10月22日","week":7,"off":false,"tip":""},{"text":"2026-10-29","cn":"10月29日","week":8,"off":false,"tip":""},{"text":"2026-11-05","cn":"11月5日","week":9,"off":false,"tip":""},{"text":"2026-11-12","cn":"11月12日","week":10,"off":false,"tip":""},{"text":"2026-11-19","cn":"11月19日","week":11,"off":false,"tip":""},{"text":"2026-11-26","cn":"11月26日","week":12,"off":false,"tip":""},{"text":"2026-12-03","cn":"12月3日","week":13,"off":false,"tip":""},{"text":"2026-12-10","cn":"12月10日","week":14,"off":false,"tip":""},{"text":"2026-12-17","cn":"12月17日","week":15,"off":false,"tip":""}],"count":11,"skipped":0},{"gi":9,"name":"新时代中国特色社会主义理论与实践研究","teacher":"沈忆勇","weekday":5,"weekdayName":"周五","weeksText":"第3-18周","periods":"第1-2节","start":"08:00","end":"09:40","timeText":"08:00 - 09:40","room":"E教109阶梯","credit":"2学分32学时","note":"","weekend":false,"color":"#0FB5A6","bg":"rgba(15,181,166,0.12)","dates":[{"text":"2026-09-25","cn":"9月25日","week":3,"off":true,"tip":"中秋节"},{"text":"2026-10-02","cn":"10月2日","week":4,"off":true,"tip":"国庆节"},{"text":"2026-10-09","cn":"10月9日","week":5,"off":false,"tip":""},{"text":"2026-10-16","cn":"10月16日","week":6,"off":false,"tip":""},{"text":"2026-10-23","cn":"10月23日","week":7,"off":false,"tip":""},{"text":"2026-10-30","cn":"10月30日","week":8,"off":false,"tip":""},{"text":"2026-11-06","cn":"11月6日","week":9,"off":false,"tip":""},{"text":"2026-11-13","cn":"11月13日","week":10,"off":false,"tip":""},{"text":"2026-11-20","cn":"11月20日","week":11,"off":false,"tip":""},{"text":"2026-11-27","cn":"11月27日","week":12,"off":false,"tip":""},{"text":"2026-12-04","cn":"12月4日","week":13,"off":false,"tip":""},{"text":"2026-12-11","cn":"12月11日","week":14,"off":false,"tip":""},{"text":"2026-12-18","cn":"12月18日","week":15,"off":false,"tip":""},{"text":"2026-12-25","cn":"12月25日","week":16,"off":false,"tip":""},{"text":"2027-01-01","cn":"1月1日","week":17,"off":true,"tip":"元旦"},{"text":"2027-01-08","cn":"1月8日","week":18,"off":false,"tip":""}],"count":13,"skipped":3},{"gi":10,"name":"法理学","teacher":"吴正茂","weekday":6,"weekdayName":"周六","weeksText":"第1周","periods":"上午+下午","start":"09:00","end":"17:00","timeText":"09:00 - 17:00","room":"E教107","credit":"2学分32学时","note":"","weekend":true,"color":"#FF6B81","bg":"rgba(255,107,129,0.12)","dates":[{"text":"2026-09-12","cn":"9月12日","week":1,"off":false,"tip":""}],"count":1,"skipped":0},{"gi":11,"name":"法理学","teacher":"吴正茂","weekday":6,"weekdayName":"周六","weeksText":"第6-7周","periods":"上午+下午","start":"09:00","end":"17:00","timeText":"09:00 - 17:00","room":"E教208","credit":"2学分32学时","note":"第6-7周教室由 E教107 调整为 E教208","weekend":true,"color":"#FF6B81","bg":"rgba(255,107,129,0.12)","dates":[{"text":"2026-10-17","cn":"10月17日","week":6,"off":false,"tip":""},{"text":"2026-10-24","cn":"10月24日","week":7,"off":false,"tip":""}],"count":2,"skipped":0},{"gi":12,"name":"宪法学","teacher":"张扩振+孙凯强","weekday":6,"weekdayName":"周六","weeksText":"第8-11周","periods":"上午+下午","start":"09:00","end":"17:00","timeText":"09:00 - 17:00","room":"E教208","credit":"2学分32学时","note":"","weekend":true,"color":"#6C5CE7","bg":"rgba(108,92,231,0.12)","dates":[{"text":"2026-10-31","cn":"10月31日","week":8,"off":false,"tip":""},{"text":"2026-11-07","cn":"11月7日","week":9,"off":false,"tip":""},{"text":"2026-11-14","cn":"11月14日","week":10,"off":false,"tip":""},{"text":"2026-11-21","cn":"11月21日","week":11,"off":false,"tip":""}],"count":4,"skipped":0},{"gi":13,"name":"中国法制史","teacher":"李守良+程译时","weekday":6,"weekdayName":"周六","weeksText":"第12-13、15周","periods":"上午+下午","start":"09:00","end":"17:00","timeText":"09:00 - 17:00","room":"E教208","credit":"2学分32学时","note":"","weekend":true,"color":"#E8846B","bg":"rgba(232,132,107,0.12)","dates":[{"text":"2026-11-28","cn":"11月28日","week":12,"off":false,"tip":""},{"text":"2026-12-05","cn":"12月5日","week":13,"off":false,"tip":""},{"text":"2026-12-19","cn":"12月19日","week":15,"off":false,"tip":""}],"count":3,"skipped":0},{"gi":14,"name":"中国法制史","teacher":"李守良+程译时","weekday":6,"weekdayName":"周六","weeksText":"第14周","periods":"上午+下午","start":"09:00","end":"17:00","timeText":"09:00 - 17:00","room":"行政楼528","credit":"2学分32学时","note":"第14周教室由 E教208 调整为 行政楼528","weekend":true,"color":"#E8846B","bg":"rgba(232,132,107,0.12)","dates":[{"text":"2026-12-12","cn":"12月12日","week":14,"off":false,"tip":""}],"count":1,"skipped":0},{"gi":15,"name":"行政法案例专题研讨","teacher":"文婧","weekday":6,"weekdayName":"周六","weeksText":"第16周","periods":"上午+下午","start":"09:00","end":"17:00","timeText":"09:00 - 17:00","room":"E教208","credit":"2学分32学时","note":"","weekend":true,"color":"#3AA6B9","bg":"rgba(58,166,185,0.12)","dates":[{"text":"2026-12-26","cn":"12月26日","week":16,"off":false,"tip":""}],"count":1,"skipped":0},{"gi":16,"name":"法理学","teacher":"吴正茂","weekday":7,"weekdayName":"周日","weeksText":"第1周","periods":"上午+下午","start":"09:00","end":"17:00","timeText":"09:00 - 17:00","room":"E教107","credit":"2学分32学时","note":"","weekend":true,"color":"#FF6B81","bg":"rgba(255,107,129,0.12)","dates":[{"text":"2026-09-13","cn":"9月13日","week":1,"off":false,"tip":""}],"count":1,"skipped":0},{"gi":17,"name":"刑事诉讼法学","teacher":"张泽涛+杨雯清","weekday":7,"weekdayName":"周日","weeksText":"第6-9周","periods":"上午+下午","start":"09:00","end":"17:00","timeText":"09:00 - 17:00","room":"E教208","credit":"2学分32学时","note":"","weekend":true,"color":"#8E7CFF","bg":"rgba(142,124,255,0.12)","dates":[{"text":"2026-10-18","cn":"10月18日","week":6,"off":false,"tip":""},{"text":"2026-10-25","cn":"10月25日","week":7,"off":false,"tip":""},{"text":"2026-11-01","cn":"11月1日","week":8,"off":false,"tip":""},{"text":"2026-11-08","cn":"11月8日","week":9,"off":false,"tip":""}],"count":4,"skipped":0},{"gi":18,"name":"刑事法案例专题研讨","teacher":"赵学军","weekday":7,"weekdayName":"周日","weeksText":"第10-13周","periods":"上午+下午","start":"09:00","end":"17:00","timeText":"09:00 - 17:00","room":"E教208","credit":"2学分32学时","note":"","weekend":true,"color":"#D4628E","bg":"rgba(212,98,142,0.12)","dates":[{"text":"2026-11-15","cn":"11月15日","week":10,"off":false,"tip":""},{"text":"2026-11-22","cn":"11月22日","week":11,"off":false,"tip":""},{"text":"2026-11-29","cn":"11月29日","week":12,"off":false,"tip":""},{"text":"2026-12-06","cn":"12月6日","week":13,"off":false,"tip":""}],"count":4,"skipped":0},{"gi":19,"name":"行政法案例专题研讨","teacher":"文婧","weekday":7,"weekdayName":"周日","weeksText":"第14-16周","periods":"上午+下午","start":"09:00","end":"17:00","timeText":"09:00 - 17:00","room":"E教208","credit":"2学分32学时","note":"","weekend":true,"color":"#3AA6B9","bg":"rgba(58,166,185,0.12)","dates":[{"text":"2026-12-13","cn":"12月13日","week":14,"off":false,"tip":""},{"text":"2026-12-20","cn":"12月20日","week":15,"off":false,"tip":""},{"text":"2026-12-27","cn":"12月27日","week":16,"off":false,"tip":""}],"count":3,"skipped":0}]};
+
+(function () {
+  'use strict';
+
+  var SEM = DATA.sem;
+  var GROUPS = DATA.groups;
+  var WEEK_RANGES = DATA.weekRanges;
+  var TOTAL_WEEKS = SEM.weeks;
+  var WD = ['', '周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+
+  /* ---------- 日期工具 ---------- */
+  var START = new Date(2026, 8, 7);
+
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+  function dateOf(week, wd) {
+    var d = new Date(START.getFullYear(), START.getMonth(), START.getDate());
+    d.setDate(d.getDate() + (week - 1) * 7 + (wd - 1));
+    return d;
+  }
+  function keyOf(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+  function cnOf(d) { return (d.getMonth() + 1) + '月' + d.getDate() + '日'; }
+  function wdOf(d) { var x = d.getDay(); return x === 0 ? 7 : x; }
+  function dayDiff(a, b) {
+    return Math.round((Date.UTC(b.getFullYear(), b.getMonth(), b.getDate()) -
+      Date.UTC(a.getFullYear(), a.getMonth(), a.getDate())) / 86400000);
+  }
+  function weekOfDate(d) { return Math.floor(dayDiff(START, d) / 7) + 1; }
+  function holidayOf(d) {
+    var k = keyOf(d);
+    for (var i = 0; i < DATA.holidays.length; i++) {
+      var h = DATA.holidays[i];
+      if (k >= h.from && k <= h.to) return h.name;
+    }
+    return '';
+  }
+  function toMin(t) { return parseInt(t.slice(0, 2), 10) * 60 + parseInt(t.slice(3, 5), 10); }
+
+  /* 老版本 iOS Safari 不支持 scrollTo(options)，做一次能力检测 */
+  var smoothOK = false;
+  try { smoothOK = ('scrollBehavior' in document.documentElement.style); } catch (e) {}
+  function scrollTop() {
+    if (smoothOK) window.scrollTo({ top: 0, behavior: 'smooth' });
+    else window.scrollTo(0, 0);
+  }
+
+  /* ---------- 状态 ---------- */
+  var today = new Date();
+  var tWeek = weekOfDate(today);
+  var inTerm = tWeek >= 1 && tWeek <= TOTAL_WEEKS;
+  var tWd = wdOf(today);
+
+  var state = {
+    week: inTerm ? tWeek : 1,
+    day: inTerm ? tWd : 1,
+    tab: 'week'
+  };
+
+  /* ---------- 数据索引 ---------- */
+  // events[week][wd] = [groupIndex,...]
+  var idx = {};
+  GROUPS.forEach(function (g, gi) {
+    g.dates.forEach(function (d) {
+      if (d.off) return;
+      if (!idx[d.week]) idx[d.week] = {};
+      if (!idx[d.week][g.weekday]) idx[d.week][g.weekday] = [];
+      idx[d.week][g.weekday].push(gi);
+    });
+  });
+
+  function eventsOf(week, wd) {
+    var list = (idx[week] && idx[week][wd]) ? idx[week][wd].slice() : [];
+    list.sort(function (a, b) { return toMin(GROUPS[a].start) - toMin(GROUPS[b].start); });
+    return list;
+  }
+
+  /* ---------- DOM ---------- */
+  var $ = function (id) { return document.getElementById(id); };
+  var elDays = $('days'), elMain = $('main'), elSheet = $('sheet'), elMask = $('mask');
+  var elSticky = $('sticky');
+
+  function renderAll() { renderHero(); renderDays(); renderMain(); renderSticky(); }
+
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  /* ---------- 渲染：头部 ---------- */
+  function renderHero() {
+    var meta = SEM.term + ' · ' + SEM.total + '人 · 共 ' + DATA.totalSessions + ' 次课';
+    if (inTerm) meta = '今天 ' + cnOf(today) + ' ' + WD[tWd] + ' · 第 ' + tWeek + ' 周 · ' + meta;
+    $('heroMeta').textContent = meta;
+    $('weekMain').textContent = '第 ' + state.week + ' 周';
+    $('weekRange').textContent = WEEK_RANGES[state.week - 1];
+    $('prevBtn').disabled = state.week <= 1;
+    $('nextBtn').disabled = state.week >= TOTAL_WEEKS;
+  }
+
+  function renderDays() {
+    var html = '';
+    for (var wd = 1; wd <= 7; wd++) {
+      var d = dateOf(state.week, wd);
+      var n = eventsOf(state.week, wd).length;
+      var cls = ['day'];
+      if (n > 0) cls.push('has');
+      if (state.week === tWeek && wd === tWd && inTerm) cls.push('today');
+      if (holidayOf(d)) cls.push('hol');
+      if (wd === state.day) cls.push('on');
+      html += '<button class="' + cls.join(' ') + '" data-wd="' + wd + '">' +
+        '<div class="n">' + WD[wd].slice(1) + '</div>' +
+        '<div class="d">' + d.getDate() + '</div>' +
+        '<div class="dot"></div></button>';
+    }
+    elDays.innerHTML = html;
+    elDays.querySelectorAll('.day').forEach(function (b) {
+      b.addEventListener('click', function () {
+        state.day = +b.getAttribute('data-wd');
+        renderAll();
+      });
+    });
+  }
+
+  /* ---------- 渲染：吸顶条 ---------- */
+  function renderSticky() {
+    var d = dateOf(state.week, state.day);
+    var isToday = inTerm && state.week === tWeek && state.day === tWd;
+    $('stickyL').innerHTML = '第 ' + state.week + ' 周 · ' + WD[state.day] +
+      '<span>' + cnOf(d) + '</span>';
+    $('stickyToday').style.display = isToday ? 'none' : '';
+  }
+
+  /* ---------- 渲染：列表 ---------- */
+  function statusOf(g, isToday) {
+    if (!isToday) return '';
+    var now = new Date();
+    var cur = now.getHours() * 60 + now.getMinutes();
+    var s = toMin(g.start), e = toMin(g.end);
+    if (cur >= e) return 'past';
+    if (cur >= s) return 'now';
+    return '';
+  }
+
+  function cardWeek(gi, isToday) {
+    var g = GROUPS[gi];
+    var st = statusOf(g, isToday);
+    var cls = 'card' + (st ? ' ' + st : '');
+    var live = st === 'now' ? '<span class="live">进行中</span>' : '';
+    return '<div class="' + cls + '" data-gi="' + gi + '">' +
+      '<div class="bar" style="background:' + g.color + '"></div>' +
+      '<div class="body">' +
+        '<div class="row1">' +
+          '<div class="cname">' + esc(g.name) + '</div>' +
+          '<div class="badge" style="color:' + g.color + ';background:' + g.bg + '">' + esc(g.periods) + '</div>' +
+        '</div>' +
+        '<div class="ctime"><span class="range" style="color:' + g.color + '">' +
+          g.start + ' - ' + g.end + '</span>' + live + '</div>' +
+        '<div class="tags">' +
+          '<span class="tag">👤 ' + esc(g.teacher) + '</span>' +
+          '<span class="tag">📍 ' + esc(g.room) + '</span>' +
+        '</div>' +
+      '</div></div>';
+  }
+
+  function cardAll(gi) {
+    var g = GROUPS[gi];
+    return '<div class="card" data-gi="' + gi + '">' +
+      '<div class="bar" style="background:' + g.color + '"></div>' +
+      '<div class="body">' +
+        '<div class="row1">' +
+          '<div class="cname">' + esc(g.name) + '</div>' +
+          '<div class="badge" style="color:' + g.color + ';background:' + g.bg + '">' + g.weekdayName + '</div>' +
+        '</div>' +
+        '<div class="ctime"><span class="range" style="color:' + g.color + '">' +
+          g.start + ' - ' + g.end + '</span><span class="per">' + esc(g.periods) + '</span></div>' +
+        '<div class="tags">' +
+          '<span class="tag">👤 ' + esc(g.teacher) + '</span>' +
+          '<span class="tag">📍 ' + esc(g.room) + '</span>' +
+        '</div>' +
+        '<div class="cmeta">' + esc(g.weeksText) + ' · <b>' + g.count + ' 次课</b>' +
+          (g.skipped ? ' · 节假日停课 ' + g.skipped + ' 次' : '') + '</div>' +
+      '</div></div>';
+  }
+
+  function renderMain() {
+    var html = '';
+
+    if (state.tab === 'week') {
+      var d = dateOf(state.week, state.day);
+      var isToday = inTerm && state.week === tWeek && state.day === tWd;
+      var list = eventsOf(state.week, state.day);
+      var hol = holidayOf(d);
+
+      html += '<div class="sec"><div><h2>' + WD[state.day] + ' · ' + cnOf(d) + '</h2>' +
+        '<p>' + (isToday ? '今天 · ' : '') + (list.length ? '共 ' + list.length + ' 次课' : '无课') + '</p></div>' +
+        (isToday || !inTerm ? '' : '<button class="todaybtn" id="btnToday">回到今天</button>') +
+        '</div>';
+
+      if (hol) {
+        html += '<div class="hol"><div class="ico">🎉</div><div>' +
+          '<div class="t">' + hol + ' · 停课</div>' +
+          '<div class="s">法定节假日，当天的课程已自动跳过</div></div></div>';
+      }
+
+      if (!list.length && !hol) {
+        html += '<div class="empty"><div class="ico">☕️</div>' +
+          '<div class="t">这天没有课</div><div class="s">好好休息一下</div></div>';
+      }
+
+      list.forEach(function (gi) { html += cardWeek(gi, isToday); });
+    } else {
+      html += '<div class="sec"><div><h2>全部课程</h2>' +
+        '<p>共 ' + GROUPS.length + ' 项安排 · 点开看全部上课日期</p></div></div>';
+      GROUPS.forEach(function (g, gi) { html += cardAll(gi); });
+    }
+
+    elMain.innerHTML = html;
+
+    var bt = $('btnToday');
+    if (bt) bt.addEventListener('click', goToday);
+    elMain.querySelectorAll('.card').forEach(function (c) {
+      c.addEventListener('click', function () { openDetail(+c.getAttribute('data-gi')); });
+    });
+  }
+
+  /* ---------- 弹层 ---------- */
+  function openSheet(html) {
+    elSheet.innerHTML = html;
+    elMask.classList.add('on');
+    elSheet.classList.add('on');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeSheet() {
+    elMask.classList.remove('on');
+    elSheet.classList.remove('on');
+    document.body.style.overflow = '';
+  }
+
+  function openDetail(gi) {
+    var g = GROUPS[gi];
+    var rows = '';
+    function row(k, v) {
+      if (!v) return;
+      rows += '<div class="srow"><div class="k">' + k + '</div><div class="v">' + esc(v) + '</div></div>';
+    }
+    row('教师', g.teacher);
+    row('周次', g.weeksText + '（共 ' + g.count + ' 次）');
+    row('星期', g.weekdayName);
+    row('时间', g.start + ' - ' + g.end + ' · ' + g.periods);
+    row('地点', g.room);
+    row('学分', g.credit);
+    if (g.weekend) row('时段', '全天（上午 09:00-12:00、下午 14:00-17:00，中间 12:00-14:00 午休）');
+    row('备注', g.note);
+
+    var chips = g.dates.map(function (x) {
+      return '<span class="chip' + (x.off ? ' off' : '') + '">' + x.cn + '</span>';
+    }).join('');
+
+    openSheet(
+      '<div class="grab"></div>' +
+      '<div class="shead"><h3>' + esc(g.name) + '</h3>' +
+      '<div class="badge" style="color:' + g.color + ';background:' + g.bg + '">' + esc(g.periods) + '</div></div>' +
+      '<div class="srows">' + rows + '</div>' +
+      '<div class="slabel">全部上课日期（' + g.count + ' 次）</div>' +
+      '<div class="chips">' + chips + '</div>' +
+      (g.skipped ? '<div class="sleg">灰色划除的 ' + g.skipped + ' 次为法定节假日，已停课</div>' : '') +
+      '<button class="sbtn" id="sheetOk">知道了</button>'
+    );
+    $('sheetOk').addEventListener('click', closeSheet);
+  }
+
+  function openWeekPicker() {
+    var cells = '';
+    for (var w = 1; w <= TOTAL_WEEKS; w++) {
+      var hasHol = false;
+      for (var wd = 1; wd <= 7; wd++) { if (holidayOf(dateOf(w, wd))) { hasHol = true; break; } }
+      cells += '<button class="wcell' + (w === state.week ? ' on' : '') + '" data-w="' + w + '">' +
+        (hasHol ? '<span class="hd"></span>' : '') +
+        '<div class="wn">第' + w + '周</div>' +
+        '<div class="wr">' + WEEK_RANGES[w - 1].split(' - ')[0] + '</div></button>';
+    }
+    var nextHol = DATA.holidays.map(function (h) { return h.name + ' ' + h.from; }).join(' · ');
+
+    openSheet(
+      '<div class="grab"></div>' +
+      '<div class="shead"><h3>选择周次</h3></div>' +
+      '<div class="slabel">橙色小点表示该周含法定节假日</div>' +
+      '<div class="wgrid">' + cells + '</div>' +
+      '<div class="sleg" style="margin-top:14px">本学期法定节假日：' + nextHol + '</div>' +
+      '<button class="sbtn" id="sheetOk">取消</button>'
+    );
+    elSheet.querySelectorAll('.wcell').forEach(function (b) {
+      b.addEventListener('click', function () {
+        state.week = +b.getAttribute('data-w');
+        closeSheet();
+        renderAll();
+        scrollTop();
+      });
+    });
+    $('sheetOk').addEventListener('click', closeSheet);
+  }
+
+  /* ---------- 交互 ---------- */
+  function goWeek(delta) {
+    var w = state.week + delta;
+    if (w < 1 || w > TOTAL_WEEKS) return;
+    state.week = w;
+    renderAll();
+  }
+  function goToday() {
+    if (!inTerm) return;
+    state.week = tWeek; state.day = tWd;
+    renderAll();
+    scrollTop();
+  }
+  function setTab(t) {
+    state.tab = t;
+    $('tabWeek').classList.toggle('on', t === 'week');
+    $('tabAll').classList.toggle('on', t === 'all');
+    renderMain();
+    scrollTop();
+  }
+
+  $('prevBtn').addEventListener('click', function () { goWeek(-1); });
+  $('nextBtn').addEventListener('click', function () { goWeek(1); });
+  $('weekMid').addEventListener('click', openWeekPicker);
+  $('tabWeek').addEventListener('click', function () { setTab('week'); });
+  $('tabAll').addEventListener('click', function () { setTab('all'); });
+  $('stickyToday').addEventListener('click', goToday);
+  $('stickyWeek').addEventListener('click', openWeekPicker);
+  elMask.addEventListener('click', closeSheet);
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeSheet();
+    else if (e.key === 'ArrowLeft') goWeek(-1);
+    else if (e.key === 'ArrowRight') goWeek(1);
+  });
+
+  /* 左右滑动切换周次 */
+  var tx = 0, ty = 0, tracking = false;
+  document.addEventListener('touchstart', function (e) {
+    if (e.touches.length !== 1 || elSheet.classList.contains('on')) { tracking = false; return; }
+    tx = e.touches[0].clientX; ty = e.touches[0].clientY; tracking = true;
+  }, { passive: true });
+  document.addEventListener('touchend', function (e) {
+    if (!tracking) return;
+    tracking = false;
+    var t = e.changedTouches[0];
+    var dx = t.clientX - tx, dy = t.clientY - ty;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 2) goWeek(dx < 0 ? 1 : -1);
+  }, { passive: true });
+
+  /* 吸顶条 */
+  var heroH = 0;
+  function measure() { heroH = document.querySelector('.hero').offsetHeight; }
+  window.addEventListener('resize', measure);
+  window.addEventListener('scroll', function () {
+    elSticky.classList.toggle('on', window.scrollY > heroH - 40);
+  }, { passive: true });
+
+  /* ---------- 启动 ---------- */
+  $('foot').innerHTML = '周末课程为全天：上午 09:00-12:00、下午 14:00-17:00（中间 12:00-14:00 午休）<br>' +
+    '第 1 周周一为 2026-09-07 · 已排除法定节假日 · 法律实践课程另行通知';
+  renderAll();
+  measure();
+  setTimeout(measure, 300);
+
+  /* 调试/自动化测试入口 */
+  window.TT = {
+    state: state,
+    data: DATA,
+    renderAll: renderAll,
+    goWeek: goWeek,
+    goToday: goToday,
+    setTab: setTab,
+    openDetail: openDetail,
+    openWeekPicker: openWeekPicker,
+    closeSheet: closeSheet,
+    eventsOf: eventsOf,
+    dateOf: dateOf,
+    holidayOf: holidayOf
+  };
+})();
+</script>
+</body>
+</html>
